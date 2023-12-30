@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, get } from "firebase/database";
 import Images from "../../services/images";
+import { onValue } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCWRyfatEZhfw7VpnwwAyzjGowT8wXL4V4",
@@ -20,16 +21,18 @@ const Home = () => {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = () => {
       try {
-        const dbRef = ref(database, "test");
-        const snapshot = await get(dbRef);
-        setData(snapshot.val());
+        const db = getDatabase(app);
+        const dbRef = ref(db, "test");
+
+        onValue(dbRef, (snapshot) => {
+          setData(snapshot.val());
+        });
       } catch (error) {
         console.error("Error fetching data:", error.message);
       }
     };
-
     fetchData();
   }, []);
   return (
